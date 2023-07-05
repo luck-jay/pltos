@@ -1,0 +1,2 @@
+#define CONFIG_DEBUG_INFO
+#define LOG_LEVEL         LOG_LEVEL_DEBUG

@@ -1,0 +1,26 @@
+export BUILD_SUBDIR_ASFLAGS := $(BUILD_SUBDIR_ASFLAGS) $(subdir-asflags-y)
+export BUILD_SUBDIR_CCFLAGS := $(BUILD_SUBDIR_CCFLAGS) $(subdir-ccflags-y)
+
+__subdir-y	:= $(patsubst %/,%,$(filter %/, $(obj-y)))
+subdir-y	+= $(__subdir-y)
+obj-y		:= $(patsubst %/, %/built-in.o, $(obj-y))
+
+# Subdirectories we need to descend into
+
+subdir-ym      := $(sort $(subdir-y))
+
+subdir-obj-y := $(filter %/built-in.o, $(obj-y))
+real-objs-y := $(foreach m, $(filter-out $(subdir-obj-y), $(obj-y)), $(if $(strip $($(m:.o=-objs)) $($(m:.o=-y))),$($(m:.o=-objs)) $($(m:.o=-y)),$(m)))
+
+
+targets		:= $(addprefix $(obj)/,$(targets))
+obj-y		:= $(addprefix $(obj)/,$(obj-y))
+subdir-obj-y	:= $(addprefix $(obj)/,$(subdir-obj-y))
+real-objs-y	:= $(addprefix $(obj)/,$(real-objs-y))
+subdir-ym	:= $(addprefix $(obj)/,$(subdir-ym))
+
+__c_flags =  $(ccflags-y) $(BUILD_SUBDIR_CCFLAGS) $(CFLAGS)
+__a_flags =  $(asflags-y) $(BUILD_SUBDIR_ASFLAGS) $(ASFLAGS)
+
+c_flags := $(__c_flags)
+a_flags := $(__a_flags)
