@@ -19,7 +19,7 @@ endif
 export quiet Q
 
 USER_INCLUDE  := \
-			-include include/pltconfig.h \
+			-include include/plt/kconfig.h \
 			-Iinclude
 
 USER_ASFLAGS  :=
@@ -80,7 +80,7 @@ endif
 
 PHONY += all clean size
 
-all: $(TARGET).bin size
+all: $(TARGET).bin
 
 objs-y += kernel app arch drivers init libs mm
 libs-y +=
@@ -99,21 +99,21 @@ $(TARGET).elf: $(sys-objs) FORCE
 	+$(call if_changed,sys)
 
 quiet_cmd_cphex = OBJCOPY    $@
-cmd_cphex = $(OBJCOPY) -O ihex $< $@
+cmd_cphex = $(OBJCOPY) -O ihex $< $@;$(MAKE) size
 
 %.hex: %.elf FORCE
-	+$(call cmd,cphex)
+	+$(call if_changed,cphex)
 
 quiet_cmd_cpbin = OBJCOPY    $@
-cmd_cpbin = $(OBJCOPY) -O binary -S $< $@
+cmd_cpbin = $(OBJCOPY) -O binary -S $< $@;$(MAKE) size
 
 %.bin: %.elf FORCE
-	+$(call cmd,cpbin)
+	+$(call if_changed,cpbin)
 
-quiet_cmd_size = SIZE    $<
-cmd_size = $(SIZE) $<
+quiet_cmd_size = SIZE    $(TARGET).elf
+cmd_size = $(SIZE) $(TARGET).elf
 
-size: $(TARGET).elf
+size:
 	+$(call cmd,size)
 
 $(sort $(sys-objs)): $(sys-dirs) ;
