@@ -62,6 +62,8 @@ OBJCOPY		= $(CROSS_COMPILE)objcopy
 OBJDUMP		= $(CROSS_COMPILE)objdump
 SIZE        = $(CROSS_COMPILE)size
 
+OCD         = openocd
+
 export AS LD CC CPP AR NM STRIP OBJCOPY OBJDUMP
 export MAKE MAKEFLAGS
 export CFLAGS CXXFLAGS LDFLAGS
@@ -128,6 +130,11 @@ cmd_rmfiles := $(RM) -r $(rm-files)
 clean:
 	$(call cmd,rmfiles)
 	$(Q)$(RM) -r $(shell find -name *.o -o -name '.*.cmd')
+
+PHONY += flash
+
+flash: $(TARGET).bin
+	$(OCD) -f scripts/openocd.cfg -c "program"
 
 PHONY += FORCE
 FORCE:
