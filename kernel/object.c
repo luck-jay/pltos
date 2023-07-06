@@ -23,7 +23,7 @@ int object_set_name(struct object *obj,
 	// 	goto __err;
 	// }
 
-	n = snprintf(obj->name, SYS_NAME_MAX_SIZE, fmt, vargs);
+	n = vsnprintf(obj->name, SYS_NAME_MAX_SIZE, fmt, vargs);
 	if (n >= SYS_NAME_MAX_SIZE)
 		log_d("Object names are too long and will be truncated!");
 
