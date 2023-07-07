@@ -79,4 +79,10 @@
 #define configKERNEL_INTERRUPT_PRIORITY          ( configLIBRARY_LOWEST_INTERRUPT_PRIORITY << (8 - configPRIO_BITS) )
 #define configMAX_SYSCALL_INTERRUPT_PRIORITY     ( configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY << (8 - configPRIO_BITS) )
 
+/*******************************************************************************/
+/*              FreeRTOS与中断服务函数有关的配置选项                           */
+/******************************************************************************/
+#define xPortPendSVHandler                       PendSV_Handler
+#define vPortSVCHandler                          SVC_Handler
+
 #endif  /* __PLT_KCONFIG_H__ */
