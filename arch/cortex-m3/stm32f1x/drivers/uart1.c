@@ -262,7 +262,7 @@ static const struct uart_ops uart1_ops = {
 	.dma_send = uart1_dma_send,
 };
 
-void serial1_register(void)
+void serial1_init(void)
 {
 	uart1_init();
 
@@ -272,4 +272,4 @@ void serial1_register(void)
 
 	serial_register(&serial1, 0);
 }
-INIT_BOARD_EXPORT(serial1_register);
+INIT_BOARD_EXPORT(serial1_init);

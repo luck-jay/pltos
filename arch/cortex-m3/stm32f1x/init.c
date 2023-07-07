@@ -5,7 +5,7 @@
 
 static void systick_init(void)
 {
-	SysTick_Config(SystemCoreClock / configTICK_RATE_HZ);
+	SysTick_Config(SystemCoreClock / SYSTEM_FREQ);
 	NVIC_SetPriority(SysTick_IRQn, 0xFF);
 }
 
@@ -19,7 +19,7 @@ void __udelay(uint32_t us)
     uint32_t told, tnow, tcnt = 0;
     uint32_t reload = SysTick->LOAD;
 
-    ticks = us * reload / (1000000 / configTICK_RATE_HZ);
+    ticks = us * reload / (1000000 / SYSTEM_FREQ);
     told = SysTick->VAL;
     while (1)
     {

@@ -1,6 +1,8 @@
 #include <plt/def.h>
 #include <plt/log.h>
 #include <plt/init.h>
+#include <rtos/FreeRTOS.h>
+#include <rtos/task.h>
 
 static void init_start(void) {
 }
@@ -18,19 +20,26 @@ static void system_init(void)
 		(*fn_ptr)();
 }
 
+static void entry_app(void *parameters)
+{
+	extern int main(void);
+
+	main();
+}
+
 int entry(void)
 {
-	int ret = 0;
-
-	extern int main(void);
 	extern void borad_init(void);
 
-	// /* 板子初始化 */
+	/* 板子初始化 */
 	borad_init();
 	/* 执行所有自动初始化函数 */
 	system_init();
-	/* 执行主函数 */
-	ret = main();
 
-	return ret;
+	/* 创建第一个任务 */
+	xTaskCreate(entry_app, "app", 500, NULL, 1, NULL);
+
+	vTaskStartScheduler();
+
+	while (1);
 }
