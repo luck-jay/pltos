@@ -253,6 +253,9 @@ void usart1_rxdma_isr_handler(void)
 
 static int uart1_dma_send(uint8_t *buf, size_t size)
 {
+	while (send_finsh_flag == 0);
+
+	send_finsh_flag = 0;
 	uart1_dmatx_config(buf, size);
 
 	return size;

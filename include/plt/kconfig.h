@@ -5,7 +5,8 @@
 #define SYS_NAME_MAX_SIZE 20
 
 /* 定义日志输出等级 */
-#define LOG_LEVEL  LOG_LEVEL_ERROR
+#define CONFIG_DEBUG_INFO 1
+#define LOG_LEVEL  LOG_LEVEL_DEBUG
 
 #define CONFIG_SYSTEM_FREQ_1000HZ 1
 
@@ -22,6 +23,9 @@
 #ifdef CONFIG_DEBUG_INFO
 #define USE_ASSERT
 #endif
+
+/* plt输入缓冲区 */
+#define __pltio_name  "serial1"
 
 /***************************************************************************************************************/
 /*                                        FreeRTOS基础配置配置选项                                              */
@@ -79,9 +83,9 @@
 #define configKERNEL_INTERRUPT_PRIORITY          ( configLIBRARY_LOWEST_INTERRUPT_PRIORITY << (8 - configPRIO_BITS) )
 #define configMAX_SYSCALL_INTERRUPT_PRIORITY     ( configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY << (8 - configPRIO_BITS) )
 
-/*******************************************************************************/
-/*              FreeRTOS与中断服务函数有关的配置选项                           */
-/******************************************************************************/
+/***************************************************************************************************************/
+/*                                FreeRTOS与中断服务函数有关的配置选项                                          */
+/***************************************************************************************************************/
 #define xPortPendSVHandler                       PendSV_Handler
 #define vPortSVCHandler                          SVC_Handler
 
