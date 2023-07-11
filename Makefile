@@ -19,6 +19,7 @@ export quiet Q
 
 USER_INCLUDE  := \
 			-include include/plt/kconfig.h \
+			-include include/generated/autoconfig.h \
 			-Iinclude
 
 USER_ASFLAGS  :=
