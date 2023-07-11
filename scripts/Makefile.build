@@ -16,6 +16,7 @@ subdir-asflags-y :=
 subdir-ccflags-y :=
 
 include scripts/Build.include
+-include include/config/auto.conf
 
 build-dir := $(src)
 build-file := $(build-dir)/Makefile

@@ -1,7 +1,6 @@
 TARGET ?= pltos
 CROSS_COMPILE ?= arm-none-eabi-
 V ?= 0
-DEBUG ?= 1
 
 MAKEFLAGS += --no-print-directory
 
@@ -35,13 +34,14 @@ USER_LDFLAGS  := \
 			-Wl,-Map,$(TARGET).map,--cref -Wl,-Tlink.lds -Wl,--gc-sections
 
 -include arch/cortex-m3/Makefile
+-include include/config/auto.conf
 
 BUILD_CFLAGS   := $(ARCH_CFLAGS) $(USER_CFLAGS) $(USER_INCLUDE)
 BUILD_ASFLAGS  := $(ARCH_ASFLAGS) $(USER_ASFLAGS)
 BUILD_CXXFLAGS := $(ARCH_CXXFLAGS) $(USER_CXXFLAGS) $(USER_INCLUDE)
 BUILD_LDFLAGS  := $(ARCH_LDFLAGS) $(USER_LDFLAGS)
 
-ifeq ($(DEBUG), 1)
+ifeq ($(CONFIG_DEBUG), y)
 CFLAGS += -g
 else
 CFLAGS += -Os
@@ -63,8 +63,9 @@ OBJDUMP		= $(CROSS_COMPILE)objdump
 SIZE        = $(CROSS_COMPILE)size
 
 OCD         = openocd
+PYTHON      = python
 
-export AS LD CC CPP AR NM STRIP OBJCOPY OBJDUMP
+export AS LD CC CPP AR NM STRIP OBJCOPY OBJDUMP OCD PYTHON
 export MAKE MAKEFLAGS
 export CFLAGS CXXFLAGS LDFLAGS
 export CHECK CHECKFLAGS
@@ -72,8 +73,7 @@ export CHECK CHECKFLAGS
 include scripts/Build.include
 
 targets := $(wildcard $(sort $(targets)))
-cmd_files := \
-	$(wildcard .*.cmd $(foreach f,$(targets),$(dir $(f)).$(notdir $(f)).cmd))
+cmd_files := $(wildcard .*.cmd $(foreach f,$(targets),$(dir $(f)).$(notdir $(f)).cmd))
 
 ifneq ($(cmd_files),)
   include $(cmd_files)
@@ -120,7 +120,7 @@ size:
 $(sort $(sys-objs)): $(sys-dirs) ;
 
 PHONY += $(sys-dirs)
-$(sys-dirs):
+$(sys-dirs): include/config/auto.conf
 	$(Q)$(MAKE) $(build)=$@
 
 rm-files = $(wildcard $(TARGET).bin $(TARGET).hex $(TARGET).elf $(TARGET).map)
@@ -132,13 +132,36 @@ clean:
 	$(call cmd,rmfiles)
 	$(Q)$(RM) -r $(shell find -name *.o -o -name '.*.cmd')
 
+PHONY += distclean
+
+distclean-files = $(wildcard .config .config.old include/config include/generated)
+quiet_cmd_distclean := $(if $(distclean-files),CLEAN    $(distclean-files))
+cmd_distclean := $(RM) -r $(distclean-files)
+
+distclean: clean
+	$(call cmd,distclean)
+
 PHONY += flash
 
 flash: $(TARGET).bin
 	$(OCD) -f scripts/openocd.cfg -c "program"
 
+include/config/%.conf: .config
+	$(PYTHON) scripts/kconfig.py silentoldconfig
+
+PHONY += menuconfig savemenuconfig defconfig allyesconfig allnoconfig
+menuconfig:
+	$(PYTHON) scripts/kconfig.py $@
+savemenuconfig:
+	$(PYTHON) scripts/kconfig.py $@
+defconfig:
+	$(PYTHON) scripts/kconfig.py $@
+allyesconfig:
+	$(PYTHON) scripts/kconfig.py $@
+allnoconfig:
+	$(PYTHON) scripts/kconfig.py $@
+
 PHONY += FORCE
 FORCE:
 
 .PHONY: $(PHONY)
-

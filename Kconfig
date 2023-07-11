@@ -1,0 +1,15 @@
+#
+# For a description of the syntax of this configuration file,
+#
+mainmenu "Configuration"
+
+menu "Compiler options"
+
+config DEBUG
+	bool "Enable debug option"
+	help
+	  This option allows debugging information to be included in the compiled bin file
+
+	  If unsure, say N.
+
+endmenu
