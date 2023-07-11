@@ -18,6 +18,9 @@ static void __printk(const char *fmt, va_list vargs)
 
 	size = vsprintf(buf, fmt, vargs);
 
+	if (size == 0)
+		return;
+
 	if (pltio_obj == NULL) {
 		memcpy(pltout_buf + pltout_cnt, buf, size);
 		pltout_cnt += size;

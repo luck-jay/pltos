@@ -5,7 +5,11 @@
 
 int main(void)
 {
-    uint8_t buf[20];
+    uint8_t buf[100];
 
-	readline(buf, "pltsh# ");
+	while (1) {
+        readline(buf, "pltsh# ");
+        log_d("%s", buf);
+        memset(buf, 0, 100);
+    }
 }
