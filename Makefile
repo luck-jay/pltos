@@ -18,8 +18,8 @@ endif
 export quiet Q
 
 USER_INCLUDE  := \
-			-include include/plt/kconfig.h \
 			-include include/generated/autoconfig.h \
+			-include include/plt/kconfig.h \
 			-Iinclude
 
 USER_ASFLAGS  :=
@@ -84,7 +84,8 @@ PHONY += all clean size
 
 all: $(TARGET).bin
 
-objs-y += kernel app arch drivers init libs mm
+objs-y += kernel app arch drivers init libs
+objs-$(CONFIG_RTOS_SUPPORT_DYNAMIC_ALLOCATION) += mm
 libs-y +=
 
 sys-libs    := $(libs-y)

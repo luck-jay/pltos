@@ -1,3 +1,3 @@
 ccflags-y = -Iinclude/rtos
 
-obj-y = heap_4.o
+obj-$(CONFIG_RTOS_SUPPORT_DYNAMIC_ALLOCATION) = heap_4.o

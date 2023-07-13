@@ -13,3 +13,33 @@ config DEBUG
 	  If unsure, say N.
 
 endmenu
+
+menu "System options"
+
+choice
+    prompt "Set system clock hz"
+    default SYSTEM_CLOCK_1000HZ
+
+config SYSTEM_CLOCK_1000HZ
+    bool "System clock 1000hz"
+
+config SYSTEM_CLOCK_250HZ
+    bool "System clock 250hz"
+
+config SYSTEM_CLOCK_100HZ
+    bool "System clock 100hz"
+
+config SYSTEM_CLOCK_10HZ
+    bool "System clock 10hz"
+
+endchoice
+
+config KERNEL_NAME_MAX_SIZE
+    int "name max szie for kenrl"
+    default 20
+    help
+        set system max name size.
+
+endmenu
+
+source "kernel/Kconfig"

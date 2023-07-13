@@ -1,0 +1,466 @@
+
+menu "RTOS Config"
+
+config RTOS_PREEMPTION
+    bool "Preemption"
+    default y
+    help
+        Set to yes to use the preemptive RTOS scheduler; set to no to use the cooperative RTOS scheduler.
+
+config RTOS_PORT_OPTIMISED_TASK_SELECTION
+    bool "Port optimise task selection"
+    default y
+    help
+        Some FreeRTOS ports have two methods for selecting the next task to execute, a generic method and a port-specific method.
+        Generic method:
+
+            - Used when set this to no, or when no port-specific method is implemented.
+            - Can be used for all FreeRTOS ports.
+            - Written entirely in C, less efficient than port-specific methods.
+            - Does not limit the maximum number of available priorities.
+        Porting specific methods:
+
+            - Not available for some ports.
+            - Used when set this to yes.
+            - Dependent on one or more architecture-specific assembly instructions
+                (typically a leading zero count [CLZ] instruction or equivalent),
+                and therefore only applicable to the architecture for which the instruction was written.
+            - More efficient than generic methods.
+            - Typically limits the maximum number of available priorities to 32.
+
+config RTOS_TICKLESS_IDLE
+    bool "Tickless idle"
+    default n
+    help
+        Set configUSE_TICK_LESS_IDLE to yes to use low-power tickless mode,
+        or no to keep the tick interrupt running at all times. Not all FreeRTOS ports implement low-power tickless mode.
+
+config RTOS_IDLE_HOOK
+    bool "Idle hook"
+    default n
+    help
+        Set this to yes to use idle hooks, or no to ignore idle hooks.
+
+config RTOS_MALLOC_FAILED_HOOK
+    bool "Malloc failed hook"
+    default n
+    help
+        When creating a task, queue, or semaphore, the kernel calls pvPortMalloc() to allocate memory from the heap.
+        The official FreeRTOS download includes four sample memory allocation schemes.
+        These schemes are implemented in the heap_1.c, heap_2.c, heap_3.c, heap_4.c, and heap_5.c source files.
+        this is only applicable when these three schemes are used.
+        The following is an example of a malloc() failure.
+        The malloc() failed hook function is a hook (or callback) function that will be called if pvPortMalloc() returns NULL,
+        if it has been defined and configured to do so.
+        It returns NULL only if there is not enough memory left in the FreeRTOS heap to allocate the requested memory.
+
+        If this is set to yes, then the application must define the malloc() failure hook function.
+        If this is set to no, then the malloc() failed hook function will not be called,
+        even if a hook function is defined. The malloc() failed hook function must have the name and prototype shown below.
+
+        void vApplicationMallocFailedHook( void );
+
+config RTOS_DAEMON_TASK_STARTUP_HOOK
+    bool "Daemon task startup hook"
+    default n
+    help
+        If RTOS_TIMERS and RTOS_DAEMON_TASK_STARTUP_HOOK are both set to yes,
+        then the application program must define the hook function and it must have the same name and prototype as the following.
+        The hook function will be called and will only be called once when the RTOS daemon task (also known as the timer service task)
+        is executed for the first time. Any application initialization code that needs to be run by RTOS can be placed in the hook function.
+
+        void void vApplicationDaemonTaskStartupHook( void );
+
+config RTOS_SB_COMPLETED_CALLBACK
+    bool "SB completed callback"
+    default n
+    help
+        Setting RTOS_SB_COMPLETED_CALLBACK requires setting xStreamBufferCreateWithCallback()
+        and xStreamBufferCreateStaticWithCallback() (and their message buffer equivalents) in builds
+        (and their message buffer equivalents). Stream buffers and message buffers created using these
+        functions can have their own unique send-complete callbacks and receive-complete callbacks,
+        where stream buffers and message buffers created with xStreamBufferCreate() and xStreamBufferCreateStatic()
+        (and their message buffer equivalents) share the same sbSEND_ COMPLETED() and sbSEND_Completed() functions.
+        COMPLETED() and sbRECEVE_COMPLETED() macro definitions. configUSE_SB_COMPLETED_CALLBACK defaults to no for
+        backward compatibility.
+
+config RTOS_TICK_HOOK
+    bool "Tick hook"
+    default n
+    help
+        Set it to yes to use the tick hook, or no to ignore the tick hook.
+
+config RTOS_CPU_CLOCK_HZ
+    int "CPU clock hz"
+    default 72000000
+
+config RTOS_SYSTICK_CLOCK_HZ
+    int "Systick clock hz"
+    default 0
+    help
+        The ARM Cortex-M port generates RTOS tick interrupts from the Cortex-M SysTick timer by default. Most Cortex-M MCUs run
+        the SysTick timer at the same frequency as the MCU itself, in which case configSYSTICK_CLOCK_HZ is not needed and it should
+        remain undefined. If the SysTick timer frequency is different from the MCU core, then RTOS_CPU_CLOCK_HZ should be set to the
+        normal MCU clock frequency and RTOS_SYSTICK_CLOCK_HZ to the SysTick clock frequency.
+
+config RTOS_MAX_PRIORITIES
+    int "Max priorities"
+    default 32
+    help
+        The number of priority levels available to application tasks .
+        Any number of tasks can share the same priority. Concurrent programs are assigned priorities individually,
+        see RTOS_MAX_CO_ROUTINE_PRIORITIES.
+        Each available priority consumes some RTOS in the RAM kernel and should not be set higher than the number
+        of priorities actually needed by the application.
+
+        If RTOS_PORT_OPTIMISED_TASK_SELECTION is set to yes, then the maximum allowed value will be limited.
+
+config RTOS_MINIMAL_STACK_SIZE
+    int "Minimal stack size"
+    default 128
+    help
+        The stack size used by idle tasks. Typically, this value should not be less than the value set in FreeRTOSConfig.h,
+        the header file located in the demo application of the port you are using.
+        This stack size is similar to the stack size parameter of the xTaskCreate() and xTaskCreateStatic() functions,
+        which is specified by word, not byte. If each element on the stack is 32 bits, then a stack of size 100 elements contains
+        400 bytes (each stack element is 32 bits and consumes 4 bytes).
+
+config RTOS_MAX_TASK_NAME_LEN
+    int "Max task name length"
+    range 0 1024
+    default 10
+    help
+        The maximum allowable length of a task descriptive name when creating a task.
+        The length is specified in characters, including the NULL termination byte.
+
+config RTOS_TRACE_FACILITY
+    bool "Trace facility"
+    default n
+    help
+        Set it to yes if you want to include other structure members and functions to assist in performing visualization and tracking.
+
+config RTOS_STATS_FORMATTING_FUNCTIONS
+    bool "Stats formatting functions"
+    default n
+    help
+        Setting configUSE_TRACE_FACILITY and configUSE_STATS_FORMATTING_FUNCTIONS to yes includes functionality in the vTaskList()
+        and vTaskGetRunTimeStats() functions. Setting either one to no ignores vTaskList() and vTaskGetRunTimeStates() at build time.
+
+config RTOS_16_BIT_TICKS
+    bool "Use 16 bit ticks"
+    default n
+    help
+        Time is measured in 'ticks', which is the number of times a tick interrupt has been executed since the RTOS kernel started.
+        The number of ticks is stored in a variable of type TickType_t.
+        Defining configUSE_16_BIT_Tick S to yes defines Tick Type_t as (typedef) unsigned 16-bit type.
+        Defining configUSE_16_BIT_TickS as no defines TickType_t as an unsigned 32-bit type (typedef).
+
+        Using a 16-bit type on both 8-bit and 16-bit architectures will greatly improve performance,
+        but will limit the maximum time period that can be specified to 65535 'ticks'. Therefore, assuming a tick frequency of 250 Hz,
+        the maximum time a task can be delayed or blocked is 262 seconds when using a 16-bit counter,
+        and 17179869 seconds when using a 32-bit counter.
+
+config RTOS_IDLE_SHOULD_YIELD
+    bool "Idle should yield"
+    default y
+    help
+        When yes, the idle task gives up CPU usage to other user tasks of the same priority.
+
+config RTOS_TASK_NOTIFICATIONS
+    bool "Task notifications"
+    default y
+    help
+        Setting RTOS_TASK_NOTIFICATIONS to yes (or undefined RTOS_TASK_NOTIFICATIONS) will include the Direct Task Notification
+        feature and its associated APIs in the build.
+        Setting RTOS_TASK_NOTIFICATIONS to no excludes the direct task notification feature and its associated APIs from the build.
+
+        If direct task notifications are included in the build, each task will consume an additional 8 bytes of RAM.
+
+config RTOS_TASK_NOTIFICATION_ARRAY_ENTRIES
+    int "Task notification array entries"
+    default 1
+    help
+        Each RTOS task has an array of task notifications. RTOS_TASK_NOTIFICATION_ARRAY_ENTRIES sets the index number of the array.
+        Prior to FreeRTOS V10.4.0, tasks had only one notification value, not an array of notification values,
+        so for backwards compatibility, if RTOS_TASK_NOTIFICATION_ARRAY_ENTRIES is undefined, it defaults to yes.
+
+config RTOS_MUTEXES
+    bool "Mutexes"
+    default y
+    help
+        Setting it to yes will include mutexes in the build, or setting it to no will ignore mutexes in the build.
+        The reader should be familiar with the differences between mutex locks and binary semaphores for FreeRTOS functionality.
+
+config RTOS_RECURSIVE_MUTEXES
+    bool "Recursive mutexes"
+    default y
+    help
+        Setting it to yes will include the recursive mutual exclusion locking feature in the build, or setting it to no will
+        ignore the recursive mutual exclusion locking feature in the build.
+
+config RTOS_COUNTING_SEMAPHORES
+    bool "Counting semaphores"
+    default y
+    select RTOS_QUEUE_SETS
+    help
+        Setting it to yes will include the counting semaphore function in the build,
+        or setting it to no will ignore the counting semaphore function in the build.
+
+config RTOS_ALTERNATIVE_API
+    bool "Alternative api"
+    default n
+    help
+        Set it to yes to include "alternative" queue functions in the build, or no to ignore "alternative" queue functions in the build.
+        The alternative queue API is described in the queue.h header file. The alternative queue API is deprecated and should not
+        be used in new designs.
+
+choice
+    prompt "Check for stack overflow"
+    default RTOS_CHECK_FOR_STACK_OVERFLOW_NO
+
+config RTOS_CHECK_FOR_STACK_OVERFLOW1
+    bool "check for stack overflow1"
+    help
+        After the RTOS kernel exits the task from the running state, the stack may reach its maximum (deepest) value because
+        the stack will contain the task context. At this point, the RTOS kernel can check to see if the processor stack pointer
+        is still in valid stack space. If the stack pointer contains a value outside the valid stack range, the stack overflow
+        hook function is called.
+        This method is fast, but is not guaranteed to catch all stack overflows. Setting RTOS_CHECK_FOR_STACK_OVERFLOW1
+        allows this method to be used.
+
+config RTOS_CHECK_FOR_STACK_OVERFLOW2
+    bool "check for stack overflow2"
+    help
+        When a task is first created, its stack is filled with a known value. When the task exits the running state,
+        the RTOS kernel can check the last 16 bytes of the valid stack range to ensure that these known values have
+        not been overwritten by task or interrupt activity. If any of these 16 bytes is no longer the initial value,
+        the stack overflow hook function is called.
+        This method is less efficient than method 1, but still quite fast. It is likely to catch stack overflows,
+        but there is still no guarantee that all overflows will be caught.
+
+        Setting RTOS_CHECK_FOR_STACK_OVERFLOW2 allows this method to be used.
+
+config RTOS_CHECK_FOR_STACK_OVERFLOW_NO
+    bool "not check for stack"
+
+endchoice
+
+config RTOS_QUEUE_REGISTRY_SIZE
+    int "Queue registry size"
+    default 8
+    help
+        The queue registry serves two purposes, both related to RTOS kernel-aware debugging:
+            - Allows association of text names and queues for easy queue identification in the debugging GUI.
+            - Contains the information needed by the debugger to locate each registered queue and semaphore.
+        The queue registry is of no use unless the RTOS kernel-aware debugger is used.
+        RTOS_QUEUE_REGISTRY_SIZE defines the maximum number of queues and semaphores that can be registered.
+        Only those queues and semaphores that are to be viewed with the RTOS kernel-aware debugger need to be registered.
+        Consult the API reference documentation for more information about vQueueAddToRegistry() and vQueueUnregisterQueue().
+
+config RTOS_TIME_SLICING
+    bool "Time slicing"
+    default y
+    help
+        By default (if RTOS_TIME_SLICING is undefined, or if RTOS_TIME_SLICING is defined as yes) FreeRTOS uses preemptive
+        priority scheduling with time slices. This means that the RTOS scheduler will always run the highest-priority task in the
+        ready state, and switch between tasks with the same priority at each RTOS tick interrupt. If RTOS_TIME_SLICING is set
+        to no, the RTOS scheduler will still run the highest-priority task that is ready, but it will not switch between tasks with
+        the same priority because of a tick interrupt.
+
+config RTOS_QUEUE_SETS
+    bool "Queue sets"
+    default y
+    help
+        Set it to yes to include queue aggregation (multiple queues and semaphores can be blocked or pending),
+        or set it to no to ignore queue aggregation.
+
+config RTOS_NEWLIB_REENTRANT
+    bool "Newlib reentrant"
+    default n
+    help
+        If configUSE_NEWLIB_REENTRANT is set to yes, then a newlib reentrant structure is assigned to each created task.
+        Note that newlib support is included by popular demand, but is not used by the FreeRTOS maintainers. FreeRTOS is
+        not responsible for the resulting newlib operations. The user must be familiar with newlib and must implement the
+        necessary system-wide stub functions. Note that at the time of writing, the current newlib design implements system-wide
+        malloc(), which must provide locks.
+
+config RTOS_ENABLE_BACKWARD_COMPATIBILITY
+    bool "Backward compatibility"
+    default n
+    help
+        The FreeRTOS.h header file contains a set of #define macros that map the names of data types used in versions of
+        FreeRTOS prior to 8.0.0 to the names used in FreeRTOS version 8.0.0. This macro allows you to upgrade the version of
+        FreeRTOS on which you build your application code from a version prior to 8.0.0 to a version later than 8.0.0 without
+        modifying the code. Setting RTOS_ENABLE_BACKWARD_COMPATIBILITY to no will ignore this macro in the build. This also
+        ensures that names prior to version 8.0.0 are not used.
+
+config RTOS_NUM_THREAD_LOCAL_STORAGE_POINTERS
+    int "Num thread local storage pointers"
+    default 0
+    help
+        Sets the thread-local storage array fetch value for each task.
+
+config RTOS_MINI_LIST_ITEM
+    bool "Mini list item"
+    default n
+    help
+        MiniListItem_t is used for the start and end marker nodes in the FreeRTOS list, and ListItem_t is used for all other
+        nodes in the FreeRTOS list. When RTOS_MINI_LIST_ITEM is set to nop123, MiniListItem_t and ListItem_t are identical.
+        When RTOS_MINI_LIST_ITEM is set to 1, MiniListItem_t contains 3 fewer fields than ListItem_t, which saves some RAM,
+        but at the cost of violating the strict aliasing rules used by some compilers for optimization. If undefined,
+        RTOS_MINI_LIST_ITEM defaults to yes for backward compatibility.
+
+choice
+    prompt "Support allocation"
+    default RTOS_SUPPORT_DYNAMIC_ALLOCATION
+
+config RTOS_SUPPORT_STATIC_ALLOCATION
+    bool "Support static allocation"
+    help
+        If RTOS_SUPPORT_STATIC_ALLOCATION is set to yes, then RTOS objects can be created using RAM provided by the application writer.
+        If RTOS_SUPPORT_STATIC_ALLOCATION is set to no, then RTOS objects can only be created using FreeRTOS allocated from the RAM heap.
+
+        If configSUPPORT_STATIC_ALLOCATION is set to yes, then the application writer must also provide two callback functions:
+        vApplicationGetIdleTaskMemory() which is used to provide the memory used by the RTOS idle tasks, and (if RTOS_TIMERS is set to yes)
+        vApplicationGetTimerTaskMemory() is used to provide the memory used by the RTOS daemon/timer service task.
+
+config RTOS_SUPPORT_DYNAMIC_ALLOCATION
+    bool "Support dynamic allocation"
+    help
+        If RTOS_SUPPORT_DYNAMIC_ALLOCATION is set to yes, then RTOS objects can be created using
+        FreeRTOS automatically allocated from the RAM heap.
+        If RTOS_SUPPORT_DYNAMIC_ALLOCATION is set to no, then RTOS objects can only be created
+        using RAM provided by the application writer.
+endchoice
+
+config RTOS_TOTAL_HEAP_SIZE
+    int "Total heap size"
+    depends on RTOS_SUPPORT_DYNAMIC_ALLOCATION
+    default 1024
+    help
+        The total amount of FreeRTOS available in the RAM heap.
+
+config RTOS_APPLICATION_ALLOCATED_HEAP
+    bool "Application allocated heap"
+    default n
+    help
+        By default, the FreeRTOS heap is declared by FreeRTOS and placed in memory by the linker. Setting RTOS_APPLICATION_ALLOCATED_HEAP
+        to yes allows the application writer to declare the heap, which allows the application writer to place the heap anywhere in memory.
+
+        If heap_1.c, heap_2.c, or heap_4.c is used and RTOS_APPLICATION_ALLOCATED_HEAP is set to yes, the application writer must provide
+        a uint8_t array with the exact name and size shown below. This array will be used as the FreeRTOS heap.
+
+        uint8_t ucHeap[ configTOTAL_HEAP_SIZE ];
+
+config RTOS_STACK_ALLOCATION_FROM_SEPARATE_HEAP
+    bool "Stack allocation from separate heap"
+    default n
+    help
+        If RTOS_STACK_ALLOCATION_FROM_SEPARATE_HEAP is set to yes, then for any task created using the xTaskCreate or
+        xTaskCreateRestricted APIs, its stack is allocated using the pvPortMallocStack function and freed using the vPortFreeStack
+        function. The user needs to implement the thread-safe pvPortMallocStack and vPortFreeStack functions. This allows the user
+        to allocate the stack for the task from a separate memory area (possibly a different heap than the FreeRTOS heap).
+
+config RTOS_GENERATE_RUN_TIME_STATS
+    bool "Generate run time stats"
+    default n
+    help
+        Enables the collection of runtime statistics. Once this is done, two more macros must be defined to ensure successful compilation.
+        - portCONFIGURE_TIMER_FOR_RUN_TIME_STATS()
+            The time base of the runtime statistics needs to have a higher resolution than the tick interrupt - otherwise the
+            statistics may be inaccurate and not really useful. It is recommended that this time base be set 10 to 100 times faster
+            than the tick interrupt. The faster the time base, the more accurate the statistics will be - but the sooner the timer
+            value will overflow.
+
+            If RTOS_GENERATE_RUN_TIME_STATS is defined as yes, the RTOS kernel automatically calls
+            portCONFIGURE_TIMER_FOR_RUN_TIME_STATS() (from the vTaskStartScheduler() API) at boot time. Application designers
+            will want to use macros to configure the appropriate time base.
+        - portGET_RUN_TIME_COUNTER_VALUE()
+            This macro should return only the current time, as configured by portCONFIGURE_TIMER_FOR_RUN_TIME_STATS().
+
+config RTOS_CO_ROUTINES
+    bool "Use co routines"
+    default n
+    help
+        Setting it to yes will include the co-programming feature in the build, or setting it to no will ignore the
+        co-programming feature in the build.
+
+config RTOS_MAX_CO_ROUTINE_PRIORITIES
+    int "Max co routine priorities"
+    default 10
+    depends on RTOS_CO_ROUTINES
+    help
+        The number of priority levels available to the application's concatenations . Any number of concurrent processes
+        can share the same priority. Tasks are assigned priorities individually, see RTOS_MAX_PRIORITIES.
+
+config RTOS_TIMERS
+    bool "Timers enable"
+    default n
+    help
+        Enable Software Timer.
+
+config RTOS_TIMER_TASK_PRIORITY
+    int "Timer task priority"
+    default 3
+    depends on RTOS_TIMERS
+    help
+        Sets the priority of the software timer service/daemon task.
+
+config RTOS_TIMER_QUEUE_LENGTH
+    int "Timer queue length"
+    default 10
+    depends on RTOS_TIMERS
+    help
+        Setting the length of the software timer command queue.
+
+config RTOS_TIMER_TASK_STACK_DEPTH
+    int "Timer task stack depth"
+    default 128
+    depends on RTOS_TIMERS
+    help
+        Sets the stack depth assigned to the software timer service/daemon task.
+
+config RTOS_KERNEL_INTERRUPT_PRIORITY
+    int "Kernel interrupt priority"
+    default 240
+
+config RTOS_MAX_SYSCALL_INTERRUPT_PRIORITY
+    int "Max syscall interrupt priority"
+    default 80
+
+config RTOS_INCLUDE_APPLICATION_DEFINED_PRIVILEGED_FUNCTIONS
+    bool "Include application defined privileged functions"
+    default n
+    help
+        Only FreeRTOS MPUs use RTOS_INCLUDE_APPLICATION_DEFINED_PRIVILEGED_FUNCTIONS.
+        If RTOS_INCLUDE_APPLICATION_DEFINED_PRIVILEGED_FUNCTIONS is set to yes, then the application writer must refer to the
+        "application_defined_privileged_functions.h" header file, where he/she can implement the functions that need to be executed
+        in privileged mode. Note that despite the .h extension, this header file should contain the implementation of the C function,
+        not just the function prototype.
+
+        Functions implemented in "application_defined_privileged_functions.h" must save and restore the privileged state of the
+        processor using the prvRaisePrivilege() function and the portRESET_PRIVILEGE() macro, respectively. For example,
+        if a library-supplied print function accesses RAM that is beyond the control of the application writer and cannot be allocated
+        to memory-protected user-mode tasks, the print function can be encapsulated in a privileged function using the following code:
+        ```c
+        void MPU_debug_printf( const char *pcMessage )
+        {
+            /* State the privilege level of the processor when the function was called. */
+            BaseType_t xRunningPrivileged = prvRaisePrivilege();
+
+            /* Call the library function, which now has access to all RAM. */
+            debug_printf( pcMessage );
+
+            /* Reset the processor privilege level to its original value. */
+            portRESET_PRIVILEGE( xRunningPrivileged );
+        }
+        ```
+        This technique should only be used during development and not in the deployment phase because it bypasses memory protection.
+
+config RTOS_HEAP_CLEAR_MEMORY_ON_FREE
+    bool "Heap clean memory on free"
+    default y
+    help
+        Memory blocks allocated using pvPortMalloc() will be cleared when freed via vPortFree().
+
+endmenu

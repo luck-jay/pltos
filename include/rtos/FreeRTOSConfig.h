@@ -70,110 +70,235 @@
 
 #ifndef FREERTOS_CONFIG_H
 #define FREERTOS_CONFIG_H
-#if 0
-/***************************************************************************************************************/
-/*                                        FreeRTOS基础配置配置选项                                              */
-/***************************************************************************************************************/
-#define configUSE_PREEMPTION                    1                       //1使用抢占式内核，0使用协程
-#define configUSE_TIME_SLICING                  1                       //1使能时间片调度(默认式使能的)
-#define configUSE_PORT_OPTIMISED_TASK_SELECTION 1                       //1启用特殊方法来选择下一个要运行的任务
-                                                                        //一般是硬件计算前导零指令，如果所使用的
-                                                                        //MCU没有这些硬件指令的话此宏应该设置为0！
-#define configUSE_TICKLESS_IDLE                 0                       //1启用低功耗tickless模式
-#define configUSE_QUEUE_SETS                    1                       //为1时启用队列
-#define configCPU_CLOCK_HZ                      (72000000)       //CPU频率
-#define configTICK_RATE_HZ                      (1000)                  //时钟节拍频率，这里设置为1000，周期就是1ms
-#define configMAX_PRIORITIES                    (32)                    //可使用的最大优先级
-#define configMINIMAL_STACK_SIZE                ((unsigned short)130)   //空闲任务使用的堆栈大小
-#define configMAX_TASK_NAME_LEN                 (16)                    //任务名字字符串长度
 
-#define configUSE_16_BIT_TICKS                  0                       //系统节拍计数器变量数据类型，
-                                                                        //1表示为16位无符号整形，0表示为32位无符号整形
-#define configIDLE_SHOULD_YIELD                 1                       //为1时空闲任务放弃CPU使用权给其他同优先级的用户任务
-#define configUSE_TASK_NOTIFICATIONS            1                       //为1时开启任务通知功能，默认开启
-#define configUSE_MUTEXES                       1                       //为1时使用互斥信号量
-#define configQUEUE_REGISTRY_SIZE               8                       //不为0时表示启用队列记录，具体的值是可以
-                                                                        //记录的队列和信号量最大数目。
-#define configCHECK_FOR_STACK_OVERFLOW          0                       //大于0时启用堆栈溢出检测功能，如果使用此功能
-                                                                        //用户必须提供一个栈溢出钩子函数，如果使用的话
-                                                                        //此值可以为1或者2，因为有两种栈溢出检测方法。
-#define configUSE_RECURSIVE_MUTEXES             1                       //为1时使用递归互斥信号量
-#define configUSE_MALLOC_FAILED_HOOK            0                       //1使用内存申请失败钩子函数
-#define configUSE_APPLICATION_TASK_TAG          0
-#define configUSE_COUNTING_SEMAPHORES           1                       //为1时使用计数信号量
-
-/***************************************************************************************************************/
-/*                                FreeRTOS与内存申请有关配置选项                                                */
-/***************************************************************************************************************/
-#define configSUPPORT_DYNAMIC_ALLOCATION        1                       //支持动态内存申请
-#define configTOTAL_HEAP_SIZE                   ((size_t)(20*1024))     //系统所有总的堆大小
-
-/***************************************************************************************************************/
-/*                                FreeRTOS与钩子函数有关的配置选项                                              */
-/***************************************************************************************************************/
-#define configUSE_IDLE_HOOK                     0                       //1，使用空闲钩子；0，不使用
-#define configUSE_TICK_HOOK                     0                       //1，使用时间片钩子；0，不使用
-
-/***************************************************************************************************************/
-/*                                FreeRTOS与运行时间和任务状态收集有关的配置选项                                 */
-/***************************************************************************************************************/
-#define configGENERATE_RUN_TIME_STATS           0                       //为1时启用运行时间统计功能
-#define configUSE_TRACE_FACILITY                1                       //为1启用可视化跟踪调试
-#define configUSE_STATS_FORMATTING_FUNCTIONS    1                       //与宏configUSE_TRACE_FACILITY同时为1时会编译下面3个函数
-                                                                        //prvWriteNameToBuffer(),vTaskList(),
-                                                                        //vTaskGetRunTimeStats()
-
-/***************************************************************************************************************/
-/*                                FreeRTOS与协程有关的配置选项                                                  */
-/***************************************************************************************************************/
-#define configUSE_CO_ROUTINES                   0                       //为1时启用协程，启用协程以后必须添加文件croutine.c
-#define configMAX_CO_ROUTINE_PRIORITIES         ( 2 )                   //协程的有效优先级数目
-
-/***************************************************************************************************************/
-/*                                FreeRTOS与软件定时器有关的配置选项                                            */
-/***************************************************************************************************************/
-#define configUSE_TIMERS                        1                               //为1时启用软件定时器
-#define configTIMER_TASK_PRIORITY               (configMAX_PRIORITIES-1)        //软件定时器优先级
-#define configTIMER_QUEUE_LENGTH                5                               //软件定时器队列长度
-#define configTIMER_TASK_STACK_DEPTH            (configMINIMAL_STACK_SIZE*2)    //软件定时器任务堆栈大小
-
-/***************************************************************************************************************/
-/*                                FreeRTOS可选函数配置选项                                                      */
-/***************************************************************************************************************/
-#define INCLUDE_xTaskGetSchedulerState          1
-#define INCLUDE_vTaskPrioritySet                1
-#define INCLUDE_uxTaskPriorityGet               1
-#define INCLUDE_vTaskDelete                     1
-#define INCLUDE_vTaskCleanUpResources           1
-#define INCLUDE_vTaskSuspend                    1
-#define INCLUDE_vTaskDelayUntil                 1
-#define INCLUDE_vTaskDelay                      1
-#define INCLUDE_eTaskGetState                   1
-#define INCLUDE_xTimerPendFunctionCall          1
-
-/***************************************************************************************************************/
-/*                                FreeRTOS与中断有关的配置选项                                                  */
-/***************************************************************************************************************/
-#ifdef __NVIC_PRIO_BITS
-	#define configPRIO_BITS             __NVIC_PRIO_BITS
-#else
-	#define configPRIO_BITS             4
-#endif
-
-//中断最低优先级
-#define configLIBRARY_LOWEST_INTERRUPT_PRIORITY        15
-//系统可管理的最高中断优先级
-#define configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY   5
-#define configKERNEL_INTERRUPT_PRIORITY          \
-    ( configLIBRARY_LOWEST_INTERRUPT_PRIORITY << (8 - configPRIO_BITS) )
-#define configMAX_SYSCALL_INTERRUPT_PRIORITY    \
-    ( configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY << (8 - configPRIO_BITS) )
-
-/*******************************************************************************/
-/*              FreeRTOS与中断服务函数有关的配置选项                           */
-/******************************************************************************/
 #define xPortPendSVHandler                       PendSV_Handler
 #define vPortSVCHandler                          SVC_Handler
+
+#ifdef CONFIG_RTOS_PREEMPTION
+#define configUSE_PREEMPTION    1
+#else
+#define configUSE_PREEMPTION    0
+#endif
+
+#ifdef CONFIG_RTOS_PORT_OPTIMISED_TASK_SELECTION
+#define configUSE_PORT_OPTIMISED_TASK_SELECTION    1
+#else
+#define configUSE_PORT_OPTIMISED_TASK_SELECTION    0
+#endif
+
+#ifdef CONFIG_RTOS_TICKLESS_IDLE
+#define configUSE_TICKLESS_IDLE   1
+#else
+#define configUSE_TICKLESS_IDLE    0
+#endif
+
+#ifdef CONFIG_RTOS_IDLE_HOOK
+#define configUSE_IDLE_HOOK   1
+#else
+#define configUSE_IDLE_HOOK    0
+#endif
+
+#ifdef CONFIG_RTOS_MALLOC_FAILED_HOOK
+#define configUSE_MALLOC_FAILED_HOOK   1
+#else
+#define configUSE_MALLOC_FAILED_HOOK    0
+#endif
+
+#ifdef CONFIG_RTOS_DAEMON_TASK_STARTUP_HOOK
+#define configUSE_DAEMON_TASK_STARTUP_HOOK   1
+#endif
+
+#ifdef CONFIG_RTOS_SB_COMPLETED_CALLBACK
+#define configUSE_SB_COMPLETED_CALLBACK   1
+#else
+#define configUSE_SB_COMPLETED_CALLBACK    0
+#endif
+
+#ifdef CONFIG_RTOS_TICK_HOOK
+#define configUSE_TICK_HOOK   CONFIG_RTOS_TICK_HOOK
+#else
+#define configUSE_TICK_HOOK    0
+#endif
+
+#define configCPU_CLOCK_HZ      CONFIG_RTOS_CPU_CLOCK_HZ
+
+#if CONFIG_RTOS_SYSTICK_CLOCK_HZ > 0
+#define configSYSTICK_CLOCK_HZ  CONFIG_RTOS_SYSTICK_CLOCK_HZ
+#endif
+#define configTICK_RATE_HZ      SYSTEM_FREQ
+
+#if (CONFIG_RTOS_PORT_OPTIMISED_TASK_SELECTION) && \
+    (CONFIG_RTOS_MAX_PRIORITIES > 32)
+#error "When CONFIG_RTOS_PORT_OPTIMISED_TASK_SELECTION is set to yes, \
+        CONFIG_RTOS_MAX_PRIORITIES cannot be greater than 32"
+#endif
+#define configMAX_PRIORITIES      CONFIG_RTOS_MAX_PRIORITIES
+#define configMINIMAL_STACK_SIZE  CONFIG_RTOS_MINIMAL_STACK_SIZE
+#define configMAX_TASK_NAME_LEN   CONFIG_RTOS_MAX_TASK_NAME_LEN
+
+#ifdef CONFIG_RTOS_TRACE_FACILITY
+#define configUSE_TRACE_FACILITY  1
+#endif
+
+#ifdef CONFIG_RTOS_STATS_FORMATTING_FUNCTIONS
+#define configUSE_STATS_FORMATTING_FUNCTIONS  1
+#endif
+
+#ifdef CONFIG_RTOS_16_BIT_TICKS
+#define configUSE_16_BIT_TICKS   1
+#else
+#define configUSE_16_BIT_TICKS    0
+#endif
+
+#ifdef CONFIG_RTOS_IDLE_SHOULD_YIELD
+#define configIDLE_SHOULD_YIELD   1
+#else
+#define configIDLE_SHOULD_YIELD    0
+#endif
+
+#ifdef CONFIG_RTOS_TASK_NOTIFICATIONS
+#define configUSE_TASK_NOTIFICATIONS   1
+#else
+#define configUSE_TASK_NOTIFICATIONS    0
+#endif
+
+#define configTASK_NOTIFICATION_ARRAY_ENTRIES CONFIG_RTOS_TASK_NOTIFICATION_ARRAY_ENTRIES
+
+#ifdef CONFIG_RTOS_MUTEXES
+#define configUSE_MUTEXES   1
+#else
+#define configUSE_MUTEXES    0
+#endif
+
+#ifdef CONFIG_RTOS_RECURSIVE_MUTEXES
+#define configUSE_RECURSIVE_MUTEXES   1
+#else
+#define configUSE_RECURSIVE_MUTEXES    0
+#endif
+
+#ifdef CONFIG_RTOS_COUNTING_SEMAPHORES
+#define configUSE_COUNTING_SEMAPHORES   1
+#else
+#define configUSE_COUNTING_SEMAPHORES    0
+#endif
+
+#ifdef CONFIG_RTOS_ALTERNATIVE_API
+#define configUSE_ALTERNATIVE_API   1
+#else
+#define configUSE_ALTERNATIVE_API    0
+#endif
+
+#ifdef RTOS_CHECK_FOR_STACK_OVERFLOW1
+#define configCHECK_FOR_STACK_OVERFLOW 1
+#else
+#ifdef RTOS_CHECK_FOR_STACK_OVERFLOW2
+#define configCHECK_FOR_STACK_OVERFLOW 2
+#else
+#define configCHECK_FOR_STACK_OVERFLOW 0
+#endif
+#endif
+
+#define configQUEUE_REGISTRY_SIZE  RTOS_QUEUE_REGISTRY_SIZE
+
+#ifdef CONFIG_RTOS_QUEUE_SETS
+#define configUSE_QUEUE_SETS   1
+#else
+#define configUSE_QUEUE_SETS    0
+#endif
+
+#ifdef CONFIG_RTOS_TIME_SLICING
+#define configUSE_TIME_SLICING   1
+#else
+#define configUSE_TIME_SLICING    0
+#endif
+
+#ifdef CONFIG_RTOS_NEWLIB_REENTRANT
+#define configUSE_NEWLIB_REENTRANT  1
+#endif
+
+#ifdef CONFIG_RTOS_ENABLE_BACKWARD_COMPATIBILITY
+#define configENABLE_BACKWARD_COMPATIBILITY   1
+#else
+#define configENABLE_BACKWARD_COMPATIBILITY    0
+#endif
+
+#if CONFIG_RTOS_NUM_THREAD_LOCAL_STORAGE_POINTERS > 0
+#define configNUM_THREAD_LOCAL_STORAGE_POINTERS  CONFIG_RTOS_NUM_THREAD_LOCAL_STORAGE_POINTERS
+#endif
+
+#ifdef CONFIG_RTOS_MINI_LIST_ITEM
+#define configUSE_MINI_LIST_ITEM   1
+#else
+#define configUSE_MINI_LIST_ITEM    0
+#endif
+
+#ifdef CONFIG_RTOS_SUPPORT_STATIC_ALLOCATION
+#define configSUPPORT_STATIC_ALLOCATION   1
+#else
+#define configSUPPORT_STATIC_ALLOCATION    0
+#endif
+
+#ifdef CONFIG_RTOS_SUPPORT_DYNAMIC_ALLOCATION
+#define configSUPPORT_DYNAMIC_ALLOCATION   1
+#else
+#define configSUPPORT_DYNAMIC_ALLOCATION    0
+#endif
+
+#define configTOTAL_HEAP_SIZE   CONFIG_RTOS_TOTAL_HEAP_SIZE
+
+#ifdef CONFIG_RTOS_APPLICATION_ALLOCATED_HEAP
+#define configAPPLICATION_ALLOCATED_HEAP  1
+#endif
+
+#ifdef CONFIG_RTOS_STACK_ALLOCATION_FROM_SEPARATE_HEAP
+#define configSTACK_ALLOCATION_FROM_SEPARATE_HEAP  1
+#endif
+
+#ifdef CONFIG_RTOS_GENERATE_RUN_TIME_STATS
+#define configGENERATE_RUN_TIME_STATS  1
+#endif
+
+#ifdef CONFIG_RTOS_CO_ROUTINES
+#define configUSE_CO_ROUTINES   1
+#else
+#define configUSE_CO_ROUTINES    0
+#endif
+
+#ifdef CONFIG_RTOS_MAX_CO_ROUTINE_PRIORITIES
+#define configMAX_CO_ROUTINE_PRIORITIES CONFIG_RTOS_MAX_CO_ROUTINE_PRIORITIES
+#endif
+
+#ifdef CONFIG_RTOS_TIMERS
+#define configUSE_TIMERS   1
+#else
+#define configUSE_TIMERS    0
+#endif
+#ifdef CONFIG_RTOS_TIMER_TASK_PRIORITY
+#define configTIMER_TASK_PRIORITY CONFIG_RTOS_TIMER_TASK_PRIORITY
+#endif
+#ifdef CONFIG_RTOS_TIMER_QUEUE_LENGTH
+#define configTIMER_QUEUE_LENGTH CONFIG_RTOS_TIMER_QUEUE_LENGTH
+#endif
+#ifdef CONFIG_RTOS_TIMER_TASK_STACK_DEPTH
+#define configTIMER_TASK_STACK_DEPTH RTOS_TIMER_TASK_STACK_DEPTH
+#endif
+
+#if CONFIG_RTOS_KERNEL_INTERRUPT_PRIORITY > 0
+#define configKERNEL_INTERRUPT_PRIORITY  CONFIG_RTOS_KERNEL_INTERRUPT_PRIORITY
+#endif
+
+#if CONFIG_RTOS_MAX_SYSCALL_INTERRUPT_PRIORITY > 0
+#define configMAX_SYSCALL_INTERRUPT_PRIORITY   CONFIG_RTOS_MAX_SYSCALL_INTERRUPT_PRIORITY
+#endif
+
+#ifdef CONFIG_RTOS_INCLUDE_APPLICATION_DEFINED_PRIVILEGED_FUNCTIONS
+#define configINCLUDE_APPLICATION_DEFINED_PRIVILEGED_FUNCTIONS 1
+#endif
+
+#ifdef CONFIG_RTOS_HEAP_CLEAR_MEMORY_ON_FREE
+#define configHEAP_CLEAR_MEMORY_ON_FREE   1
+#else
+#define configHEAP_CLEAR_MEMORY_ON_FREE    0
 #endif
 
 #endif /* FREERTOS_CONFIG_H */
