@@ -5,3 +5,8 @@
 *.bin
 *.map
 *.elf
+/scripts/__pycache__/
+/include/config/
+/include/generated/
+.config
+.config.old

@@ -14,13 +14,13 @@ static inline void init_ref(struct ref *ref)
 
 static inline void get_ref(struct ref *ref)
 {
-	atomic_inc(&ref->refcnt);
+	Atomic_Increment_u32(&ref->refcnt);
 }
 
 static inline
 err_t put_ref(struct ref *ref, void (*release) (struct ref *ref))
 {
-	atomic_dec(&ref->refcnt);
+	Atomic_Decrement_u32(&ref->refcnt);
 	if (ref->refcnt == 0) {
 		release(ref);
 		return 1;

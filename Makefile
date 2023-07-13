@@ -1,7 +1,6 @@
 TARGET ?= pltos
 CROSS_COMPILE ?= arm-none-eabi-
 V ?= 0
-DEBUG ?= 1
 
 MAKEFLAGS += --no-print-directory
 
@@ -19,7 +18,8 @@ endif
 export quiet Q
 
 USER_INCLUDE  := \
-			-include include/pltconfig.h \
+			-include include/generated/autoconfig.h \
+			-include include/plt/kconfig.h \
 			-Iinclude
 
 USER_ASFLAGS  :=
@@ -35,13 +35,14 @@ USER_LDFLAGS  := \
 			-Wl,-Map,$(TARGET).map,--cref -Wl,-Tlink.lds -Wl,--gc-sections
 
 -include arch/cortex-m3/Makefile
+-include include/config/auto.conf
 
 BUILD_CFLAGS   := $(ARCH_CFLAGS) $(USER_CFLAGS) $(USER_INCLUDE)
 BUILD_ASFLAGS  := $(ARCH_ASFLAGS) $(USER_ASFLAGS)
 BUILD_CXXFLAGS := $(ARCH_CXXFLAGS) $(USER_CXXFLAGS) $(USER_INCLUDE)
 BUILD_LDFLAGS  := $(ARCH_LDFLAGS) $(USER_LDFLAGS)
 
-ifeq ($(DEBUG), 1)
+ifeq ($(CONFIG_DEBUG), y)
 CFLAGS += -g
 else
 CFLAGS += -Os
@@ -63,8 +64,9 @@ OBJDUMP		= $(CROSS_COMPILE)objdump
 SIZE        = $(CROSS_COMPILE)size
 
 OCD         = openocd
+PYTHON      = python
 
-export AS LD CC CPP AR NM STRIP OBJCOPY OBJDUMP
+export AS LD CC CPP AR NM STRIP OBJCOPY OBJDUMP OCD PYTHON
 export MAKE MAKEFLAGS
 export CFLAGS CXXFLAGS LDFLAGS
 export CHECK CHECKFLAGS
@@ -80,9 +82,10 @@ endif
 
 PHONY += all clean size
 
-all: $(TARGET).bin size
+all: $(TARGET).bin
 
-objs-y += kernel app arch drivers init libs mm
+objs-y += kernel app arch drivers init libs
+objs-$(CONFIG_RTOS_SUPPORT_DYNAMIC_ALLOCATION) += mm
 libs-y +=
 
 sys-libs    := $(libs-y)
@@ -99,27 +102,27 @@ $(TARGET).elf: $(sys-objs) FORCE
 	+$(call if_changed,sys)
 
 quiet_cmd_cphex = OBJCOPY    $@
-cmd_cphex = $(OBJCOPY) -O ihex $< $@
+cmd_cphex = $(OBJCOPY) -O ihex $< $@;$(MAKE) size
 
 %.hex: %.elf FORCE
-	+$(call cmd,cphex)
+	+$(call if_changed,cphex)
 
 quiet_cmd_cpbin = OBJCOPY    $@
-cmd_cpbin = $(OBJCOPY) -O binary -S $< $@
+cmd_cpbin = $(OBJCOPY) -O binary -S $< $@;$(MAKE) size
 
 %.bin: %.elf FORCE
-	+$(call cmd,cpbin)
+	+$(call if_changed,cpbin)
 
-quiet_cmd_size = SIZE    $<
-cmd_size = $(SIZE) $<
+quiet_cmd_size = SIZE    $(TARGET).elf
+cmd_size = $(SIZE) $(TARGET).elf
 
-size: $(TARGET).elf
+size:
 	+$(call cmd,size)
 
 $(sort $(sys-objs)): $(sys-dirs) ;
 
 PHONY += $(sys-dirs)
-$(sys-dirs):
+$(sys-dirs): include/config/auto.conf
 	$(Q)$(MAKE) $(build)=$@
 
 rm-files = $(wildcard $(TARGET).bin $(TARGET).hex $(TARGET).elf $(TARGET).map)
@@ -131,13 +134,36 @@ clean:
 	$(call cmd,rmfiles)
 	$(Q)$(RM) -r $(shell find -name *.o -o -name '.*.cmd')
 
+PHONY += distclean
+
+distclean-files = $(wildcard .config .config.old include/config include/generated)
+quiet_cmd_distclean := $(if $(distclean-files),CLEAN    $(distclean-files))
+cmd_distclean := $(RM) -r $(distclean-files)
+
+distclean: clean
+	$(call cmd,distclean)
+
 PHONY += flash
 
 flash: $(TARGET).bin
 	$(OCD) -f scripts/openocd.cfg -c "program"
 
+include/config/%.conf: .config
+	$(PYTHON) scripts/kconfig.py silentoldconfig
+
+PHONY += menuconfig savemenuconfig defconfig allyesconfig allnoconfig
+menuconfig:
+	$(PYTHON) scripts/kconfig.py $@
+savemenuconfig:
+	$(PYTHON) scripts/kconfig.py $@
+defconfig:
+	$(PYTHON) scripts/kconfig.py $@
+allyesconfig:
+	$(PYTHON) scripts/kconfig.py $@
+allnoconfig:
+	$(PYTHON) scripts/kconfig.py $@
+
 PHONY += FORCE
 FORCE:
 
 .PHONY: $(PHONY)
-
