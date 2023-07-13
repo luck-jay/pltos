@@ -40,6 +40,10 @@ config KERNEL_NAME_MAX_SIZE
     help
         set system max name size.
 
+config LOG
+    bool "log enable"
+    default y
+
 endmenu
 
 source "kernel/Kconfig"
