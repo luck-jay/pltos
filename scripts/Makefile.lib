@@ -22,5 +22,5 @@ subdir-ym	:= $(addprefix $(obj)/,$(subdir-ym))
 __c_flags =  $(ccflags-y) $(BUILD_SUBDIR_CCFLAGS) $(CFLAGS)
 __a_flags =  $(asflags-y) $(BUILD_SUBDIR_ASFLAGS) $(ASFLAGS)
 
-c_flags := $(__c_flags)
-a_flags := $(__a_flags)
+c_flags = -Wp,-MD,$(depfile) $(__c_flags)
+a_flags = -Wp,-MD,$(depfile) $(__a_flags)
