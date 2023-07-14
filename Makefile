@@ -52,10 +52,13 @@ CFLAGS   += $(BUILD_CFLAGS)
 CXXFLAGS += $(BUILD_CXXFLAGS)
 LDFLAGS  += $(BUILD_LDFLAGS)
 
-BUILD_FLAGS = -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs -fno-strict-aliasing -fno-common \
-			-Werror-implicit-function-declaration -Wno-format-security -fno-delete-null-pointer-checks \
-			-fomit-frame-pointer -fno-var-tracking-assignments -fconserve-stack -Werror=implicit-int \
-			-Werror=strict-prototypes -Werror=incompatible-pointer-types -Werror=date-time
+BUILD_FLAGS = \
+	-Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
+	-fno-strict-aliasing -fno-common -Werror-implicit-function-declaration \
+	-Wno-format-security -fno-delete-null-pointer-checks -fomit-frame-pointer \
+	-fno-var-tracking-assignments -fconserve-stack -Werror=implicit-int \
+	-Werror=strict-prototypes -Werror=incompatible-pointer-types \
+	-Werror=date-time
 
 CFLAGS += $(BUILD_FLAGS)
 CXXFLAGS += $(BUILD_FLAGS)
@@ -80,6 +83,15 @@ export CFLAGS CXXFLAGS LDFLAGS
 export CHECK CHECKFLAGS
 
 include scripts/Build.include
+
+no-dot-config-targets := clean help distclean %config
+
+dot-config := 1
+ifneq ($(filter $(no-dot-config-targets), $(MAKECMDGOALS)),)
+	ifeq ($(filter-out $(no-dot-config-targets), $(MAKECMDGOALS)),)
+		dot-config := 0
+	endif
+endif
 
 targets := $(wildcard $(sort $(targets)))
 cmd_files := $(wildcard .*.cmd $(foreach f,$(targets),$(dir $(f)).$(notdir $(f)).cmd))
@@ -156,8 +168,13 @@ PHONY += flash
 flash: $(TARGET).bin
 	$(OCD) -f scripts/openocd.cfg -c "program"
 
+ifeq ($(dot-config),1)
+.config: ;
 include/config/%.conf: .config
 	$(PYTHON) scripts/kconfig.py silentoldconfig
+else
+include/config/auto.conf: ;
+endif
 
 PHONY += menuconfig savemenuconfig defconfig allyesconfig allnoconfig
 menuconfig:

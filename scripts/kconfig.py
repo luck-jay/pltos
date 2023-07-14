@@ -19,13 +19,16 @@ def auto_save():
     auto_conf_dir = os.path.dirname(auto_conf)
     if not os.path.exists(auto_conf_dir):
         os.makedirs(auto_conf_dir)
-    autofile = open(auto_conf, 'w', encoding='utf-8')
-    with open('.config', 'r') as conf:
-        for line in conf.readlines():
-            if line[0] != "#":
-                autofile.write(line)
-
-    autofile.close()
+    try:
+        with open('.config', 'r') as conf:
+            autofile = open(auto_conf, 'w', encoding='utf-8')
+            for line in conf.readlines():
+                if line[0] != "#":
+                    autofile.write(line)
+            autofile.close()
+    except FileNotFoundError:
+        print('not found .config file \n Please run some configurator (e.g. "make menuconfig" or "make defconfig")')
+        exit(1)
 
 
 def mconfig(argv):
