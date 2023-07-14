@@ -52,6 +52,17 @@ CFLAGS   += $(BUILD_CFLAGS) -Wall
 CXXFLAGS += $(BUILD_CXXFLAGS) -Wall
 LDFLAGS  += $(BUILD_LDFLAGS)
 
+BUILD_FLAGS = \
+	-Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
+	-fno-strict-aliasing -fno-common -Werror-implicit-function-declaration \
+	-Wno-format-security -fno-delete-null-pointer-checks \
+	-fomit-frame-pointer -fno-var-tracking-assignments -fconserve-stack \
+	-Werror=implicit-int -Werror=strict-prototypes \
+	-Werror=incompatible-pointer-types -Werror=date-time
+
+CFLAGS += $(BUILD_FLAGS)
+CXXFLAGS += $(BUILD_FLAGS)
+
 AS		= $(CROSS_COMPILE)as
 LD		= $(CROSS_COMPILE)ld
 CC		= $(CROSS_COMPILE)gcc
@@ -132,7 +143,7 @@ cmd_rmfiles := $(RM) -r $(rm-files)
 
 clean:
 	$(call cmd,rmfiles)
-	$(Q)$(RM) -r $(shell find -name *.o -o -name '.*.cmd')
+	$(Q)$(RM) -r $(shell find -name *.o -o -name '.*.cmd' -o -name '.*.d')
 
 PHONY += distclean
 

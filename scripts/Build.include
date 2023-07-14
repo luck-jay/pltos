@@ -11,6 +11,8 @@ build := -f scripts/Makefile.build obj
 
 escsq = $(subst $(squote),'\$(squote)',$1)
 
+depfile = $(subst $(comma),_,$(dot-target).d)
+
 echo-cmd = $(if $($(quiet)cmd_$(1)),\
 	echo '  $(call escsq,$($(quiet)cmd_$(1)))$(echo-why)';)
 cmd = @$(echo-cmd) $(cmd_$(1))
@@ -27,3 +29,6 @@ if_changed = $(if $(strip $(any-prereq) $(arg-check)),                       \
 	$(echo-cmd) $(cmd_$1);                                             \
 	printf '%s\n' 'cmd_$@ := $(make-cmd)' > $(dot-target).cmd, @:)
 
+if_changed_rule = $(if $(strip $(any-prereq) $(arg-check)),                       \
+	@set -e;                                                             \
+	$(rule_$(1)), @:)

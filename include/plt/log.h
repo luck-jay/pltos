@@ -6,7 +6,7 @@
 #define LOG_LEVEL_DEBUG   2
 #define LOG_LEVEL_INFO    3
 
-#ifdef CONFIG_DEBUG_INFO
+#ifdef CONFIG_LOG
 extern void print_log(int level, const char *fmt, ...);
 #define log(level, fmt, ...)  print_log(level, fmt "\r\n", ##__VA_ARGS__)
 #else
