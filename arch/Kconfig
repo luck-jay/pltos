@@ -1,0 +1,20 @@
+menu "CPU Arch"
+
+choice
+    prompt "Arch select for cpu"
+    default CORTEX_M3
+
+config CORTEX_M0
+    bool "CPU arch for cortex-m0"
+
+config CORTEX_M3
+    bool "CPU arch for cortex-m3"
+
+config CORTEX_M4
+    bool "CPU arch for cortex-m4"
+
+endchoice
+
+source "arch/cortex-m3/Kconfig"
+
+endmenu

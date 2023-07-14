@@ -1,0 +1,6 @@
+menu "Select libs"
+
+config READLINE
+    bool "enable readline"
+
+endmenu

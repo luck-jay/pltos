@@ -5,12 +5,18 @@ mainmenu "Configuration"
 
 menu "Compiler options"
 
+config CROSS_COMPILE
+    string "Cross-compiler tool prefix"
+    help
+        Same as running 'make CROSS_COMPILE=prefix-' but stored for
+        default make runs in this application build directory.  You don't
+        need to set this unless you want the configured application build
+        directory to select the cross-compiler automatically.
+
 config DEBUG
 	bool "Enable debug option"
 	help
-	  This option allows debugging information to be included in the compiled bin file
-
-	  If unsure, say N.
+	    This option allows debugging information to be included in the compiled bin file
 
 endmenu
 
@@ -46,4 +52,7 @@ config LOG
 
 endmenu
 
+source "arch/Kconfig"
 source "kernel/Kconfig"
+source "libs/Kconfig"
+source "app/Kconfig"

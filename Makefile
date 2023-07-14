@@ -1,6 +1,4 @@
 TARGET ?= pltos
-CROSS_COMPILE ?= arm-none-eabi-
-V ?= 0
 
 MAKEFLAGS += --no-print-directory
 
@@ -34,8 +32,10 @@ USER_CXXFLAGS :=
 USER_LDFLAGS  := \
 			-Wl,-Map,$(TARGET).map,--cref -Wl,-Tlink.lds -Wl,--gc-sections
 
--include arch/cortex-m3/Makefile
 -include include/config/auto.conf
+-include arch/cortex-m3/Makefile
+
+CROSS_COMPILE ?= $(CONFIG_CROSS_COMPILE)
 
 BUILD_CFLAGS   := $(ARCH_CFLAGS) $(USER_CFLAGS) $(USER_INCLUDE)
 BUILD_ASFLAGS  := $(ARCH_ASFLAGS) $(USER_ASFLAGS)
@@ -48,17 +48,14 @@ else
 CFLAGS += -Os
 endif
 ASFLAGS  += $(BUILD_ASFLAGS)
-CFLAGS   += $(BUILD_CFLAGS) -Wall
-CXXFLAGS += $(BUILD_CXXFLAGS) -Wall
+CFLAGS   += $(BUILD_CFLAGS)
+CXXFLAGS += $(BUILD_CXXFLAGS)
 LDFLAGS  += $(BUILD_LDFLAGS)
 
-BUILD_FLAGS = \
-	-Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
-	-fno-strict-aliasing -fno-common -Werror-implicit-function-declaration \
-	-Wno-format-security -fno-delete-null-pointer-checks \
-	-fomit-frame-pointer -fno-var-tracking-assignments -fconserve-stack \
-	-Werror=implicit-int -Werror=strict-prototypes \
-	-Werror=incompatible-pointer-types -Werror=date-time
+BUILD_FLAGS = -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs -fno-strict-aliasing -fno-common \
+			-Werror-implicit-function-declaration -Wno-format-security -fno-delete-null-pointer-checks \
+			-fomit-frame-pointer -fno-var-tracking-assignments -fconserve-stack -Werror=implicit-int \
+			-Werror=strict-prototypes -Werror=incompatible-pointer-types -Werror=date-time
 
 CFLAGS += $(BUILD_FLAGS)
 CXXFLAGS += $(BUILD_FLAGS)
@@ -178,3 +175,4 @@ PHONY += FORCE
 FORCE:
 
 .PHONY: $(PHONY)
+
