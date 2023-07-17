@@ -21,7 +21,6 @@ arch-cflags-$(CONFIG_STM32_LOW_CAPACITY) = -DSTM32F10X_MD
 ARCH_ASFLAGS  := $(MCU) $(FLAGS)
 
 ARCH_CFLAGS   := $(MCU) $(FLAGS) $(arch-cflags-y) -Iarch/cortex-m3/include
-ARCH_CXXFLAGS := $(MCU) $(FLAGS)
 # -flto 允许编译器在链接过程中对整个程序进行优化，包括多个源文件之间的优化
 ARCH_LDFLAGS  := $(FLAGS) # -flto
 

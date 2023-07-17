@@ -4,7 +4,6 @@ src := $(obj)
 PHONY := __build
 
 obj-y :=
-lib-y :=
 targets :=
 subdir-y :=
 asflags-y  :=
