@@ -1,0 +1,9 @@
+menu "Application options"
+
+config APP_PLTSH
+    bool "Pltsh enable"
+    default n
+    help
+        enable pltsh.
+
+endmenu

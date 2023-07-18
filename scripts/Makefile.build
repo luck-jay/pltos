@@ -4,7 +4,6 @@ src := $(obj)
 PHONY := __build
 
 obj-y :=
-lib-y :=
 targets :=
 subdir-y :=
 asflags-y  :=
@@ -31,15 +30,13 @@ endif
 __build: $(builtin-target) $(subdir-ym)
 
 define rule_cc_o_c
-	$(echo-cmd) $(cmd_$(1)); \
-	printf '%s\n' 'cmd_$@ := $(make-cmd)' > $(dot-target).cmd; \
-	rm -f $(depfile);
+	$(call cmd_and_fixdep,cc_o_c)
+	@rm -f $(depfile)
 endef
 
 define rule_as_o_S
-	$(echo-cmd) $(cmd_$(1)); \
-	printf '%s\n' 'cmd_$@ := $(make-cmd)' > $(dot-target).cmd; \
-	rm -f $(depfile);
+	$(call cmd_and_fixdep,as_o_S)
+	@rm -f $(depfile)
 endef
 
 quiet_cmd_link_o_target = LD    $@
@@ -55,7 +52,7 @@ $(obj)/%.o: $(src)/%.c FORCE
 	$(call if_changed_rule,cc_o_c)
 
 quiet_cmd_as_o_S = AS    $@
-cmd_as_o_S = $(AS) $(as_flags) -c -o $@ $<
+cmd_as_o_S = $(CC) $(a_flags) -c -o $@ $<
 
 $(obj)/%.o: $(src)/%.S FORCE
 	$(call if_changed_rule,as_o_S)
