@@ -24,6 +24,11 @@ any-prereq = $(filter-out $(PHONY),$?) $(filter-out $(PHONY) $(wildcard $^),$^)
 
 make-cmd = $(call escsq,$(subst \#,\\\#,$(subst $$,$$$$,$(cmd_$(1)))))
 
+cmd_and_fixdep = \
+	$(echo-cmd) $(cmd_$(1)); \
+	$(PYTHON) scripts/fixdep.py $(depfile) $@ '$(make-cmd)' > $(dot-target).tmp; \
+	mv -f $(dot-target).tmp $(dot-target).cmd;
+
 if_changed = $(if $(strip $(any-prereq) $(arg-check)),                       \
 	@set -e;                                                             \
 	$(echo-cmd) $(cmd_$1);                                             \

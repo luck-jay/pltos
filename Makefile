@@ -33,7 +33,7 @@ USER_LDFLAGS  := \
 -include include/config/auto.conf
 -include arch/cortex-m3/Makefile
 
-CROSS_COMPILE ?= $(CONFIG_CROSS_COMPILE)
+CROSS_COMPILE ?= $(CONFIG_CROSS_COMPILE:"%"=%)
 
 BUILD_CFLAGS   := $(ARCH_CFLAGS) $(USER_CFLAGS) $(USER_INCLUDE)
 BUILD_ASFLAGS  := $(ARCH_ASFLAGS) $(USER_ASFLAGS)
