@@ -146,7 +146,8 @@ cmd_rmfiles := $(RM) -r $(rm-files)
 
 clean:
 	$(call cmd,rmfiles)
-	$(Q)$(RM) -r $(shell find -name *.o -o -name '.*.cmd' -o -name '.*.d')
+	$(Q)$(RM) -r $(shell find -name *.o -o -name '.*.cmd' -o -name '.*.d' \
+		-o -name '.*.tmp')
 
 PHONY += distclean
 
