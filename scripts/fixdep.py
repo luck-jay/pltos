@@ -42,7 +42,7 @@ def main():
 
 if __name__ == "__main__":
     if len(sys.argv) != 4:
-        print("fixdep.py: Number of incorrect parameters.")
+        sys.stderr.writelines("fixdep.py: Number of incorrect parameters.\n")
         exit(1)
 
     dep_file_name = sys.argv[1]
