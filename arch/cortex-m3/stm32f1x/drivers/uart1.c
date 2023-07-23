@@ -12,6 +12,8 @@
 static unsigned char uart_tmp_buf[READ_BUF_SIZE];
 #define USART1_BUF_SIZE 512
 static unsigned char usart1_buf_data[USART1_BUF_SIZE];
+#define USART1_SEND_BUF_SIZE 128
+static unsigned char usart1_send_buf[USART1_SEND_BUF_SIZE];
 
 static uint8_t send_finsh_flag = 1;
 static size_t read_index;
@@ -152,10 +154,12 @@ static void uart1_dmatx_config(uint8_t *mem_addr, size_t mem_size)
 {
   	DMA_InitTypeDef DMA_InitStructure;
 
+	memcpy(usart1_send_buf, mem_addr, mem_size);
+
 	DMA_DeInit(DMA1_Channel4);
 	DMA_Cmd(DMA1_Channel4, DISABLE);
 	DMA_InitStructure.DMA_PeripheralBaseAddr 	= (uint32_t)&(USART1->DR);
-	DMA_InitStructure.DMA_MemoryBaseAddr 		= (uint32_t)mem_addr;
+	DMA_InitStructure.DMA_MemoryBaseAddr 		= (uint32_t)usart1_send_buf;
 	DMA_InitStructure.DMA_DIR 					= DMA_DIR_PeripheralDST; 	/* 传输方向:内存->外设 */
 	DMA_InitStructure.DMA_BufferSize 			= mem_size;
 	DMA_InitStructure.DMA_PeripheralInc 		= DMA_PeripheralInc_Disable;
@@ -253,10 +257,9 @@ void usart1_rxdma_isr_handler(void)
 
 static int uart1_dma_send(uint8_t *buf, size_t size)
 {
+	while (send_finsh_flag == 0);
 	send_finsh_flag = 0;
 	uart1_dmatx_config(buf, size);
-
-	while (send_finsh_flag == 0);
 
 	return size;
 }
