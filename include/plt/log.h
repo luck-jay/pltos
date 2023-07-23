@@ -13,10 +13,6 @@ extern void print_log(int level, const char *fmt, ...);
 #define log(level, fmt, ...) do { } while (0)
 #endif
 
-#ifndef LOG_LEVEL
-#define LOG_LEVEL -1
-#endif
-
 #if (LOG_LEVEL >= LOG_LEVEL_ERROR)
 #define log_e(fmt, ...)  log(LOG_LEVEL_ERROR, "[E]: " fmt, ##__VA_ARGS__)
 #else

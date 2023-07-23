@@ -5,7 +5,11 @@
 #define SYS_NAME_MAX_SIZE CONFIG_KERNEL_NAME_MAX_SIZE
 
 /* 定义日志输出等级 */
-#define LOG_LEVEL  LOG_LEVEL_DEBUG
+#ifdef CONFIG_LOG
+#define LOG_LEVEL  CONFIG_LOG_LEVEL
+#else
+#define LOG_LEVEL  -1
+#endif
 
 /* 系统工作频率 */
 #ifdef CONFIG_SYSTEM_CLOCK_1000HZ
