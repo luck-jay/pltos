@@ -3,8 +3,8 @@
 
 #define LOG_LEVEL_ERROR   0
 #define LOG_LEVEL_WARNING 1
-#define LOG_LEVEL_DEBUG   2
-#define LOG_LEVEL_INFO    3
+#define LOG_LEVEL_INFO    2
+#define LOG_LEVEL_DEBUG   3
 
 #ifdef CONFIG_LOG
 extern void print_log(int level, const char *fmt, ...);
@@ -27,15 +27,16 @@ extern void print_log(int level, const char *fmt, ...);
 #else
 #define log_w(fmt, ...) do { } while (0)
 #endif
-#if (LOG_LEVEL >= LOG_LEVEL_DEBUG)
-#define log_d(fmt, ...)  log(LOG_LEVEL_DEBUG, "[D]: " fmt, ##__VA_ARGS__)
-#else
-#define log_d(fmt, ...) do { } while (0)
-#endif
 #if (LOG_LEVEL >= LOG_LEVEL_INFO)
 #define log_i(fmt, ...)  log(LOG_LEVEL_INFO, "[I]: " fmt, ##__VA_ARGS__)
 #else
 #define log_i(fmt, ...) do { } while (0)
+#endif
+
+#if (LOG_LEVEL >= LOG_LEVEL_DEBUG)
+#define log_d(fmt, ...)  log(LOG_LEVEL_DEBUG, "[D]: " fmt, ##__VA_ARGS__)
+#else
+#define log_d(fmt, ...) do { } while (0)
 #endif
 
 #endif /* __PLT_LOG_H__ */
