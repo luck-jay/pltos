@@ -336,7 +336,7 @@ endchoice
 config RTOS_TOTAL_HEAP_SIZE
     int "Total heap size"
     depends on RTOS_SUPPORT_DYNAMIC_ALLOCATION
-    default 1024
+    default 4096
     help
         The total amount of FreeRTOS available in the RAM heap.
 
