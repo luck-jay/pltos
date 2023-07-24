@@ -15,6 +15,12 @@ config CORTEX_M4
 
 endchoice
 
+config ARCH
+	string
+	default "cortex-m0" if CORTEX_M0
+	default "cortex-m3" if CORTEX_M3
+	default "cortex-m4" if CORTEX_M4
+
 source "arch/cortex-m3/Kconfig"
 
 endmenu
