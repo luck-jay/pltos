@@ -1,25 +1,11 @@
 choice
     prompt "Select CPU type"
     depends on CORTEX_M3
-    default STM32
+    default STM32F10X
 
-config STM32
-    bool "stm32"
-
-endchoice
-
-choice
-    prompt "Select stm32 type"
-    depends on STM32
-    default STM32_HIGH_CAPACITY
-
-config STM32_LOW_CAPACITY
-    bool "Low capacity type"
-
-config STM32_MID_CAPACITY
-    bool "Mid capacity type"
-
-config STM32_HIGH_CAPACITY
-    bool "High capacity type"
+config STM32F10X
+    bool "stm32f10x"
 
 endchoice
+
+source "arch/cortex-m3/stm32f1x/Kconfig"

@@ -1,1 +1,1 @@
-obj-y = cortex-m3/
+obj-$(CONFIG_CORTEX_M3) = cortex-m3/
