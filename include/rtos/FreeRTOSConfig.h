@@ -301,4 +301,12 @@
 #define configHEAP_CLEAR_MEMORY_ON_FREE    0
 #endif
 
+#ifdef CONFIG_RTOS_VTASKDELAY
+#define INCLUDE_vTaskDelay      1
+#endif
+
+#ifdef CONFIG_RTOS_VTASKDELETE
+#define INCLUDE_vTaskDelete     1
+#endif
+
 #endif /* FREERTOS_CONFIG_H */

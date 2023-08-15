@@ -65,5 +65,6 @@ endmenu
 
 source "arch/Kconfig"
 source "kernel/Kconfig"
+source "mm/Kconfig"
 source "libs/Kconfig"
 source "app/Kconfig"

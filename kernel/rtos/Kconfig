@@ -463,4 +463,11 @@ config RTOS_HEAP_CLEAR_MEMORY_ON_FREE
     help
         Memory blocks allocated using pvPortMalloc() will be cleared when freed via vPortFree().
 
+config RTOS_VTASKDELAY
+	bool "Enable vTaskDelay Function"
+	default n
+
+config RTOS_VTASKDELETE
+	bool "Enable vTaskDelete Function"
+	default n
 endmenu

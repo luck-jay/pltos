@@ -2,6 +2,7 @@
 #include <misc.h>
 #include <rtos/FreeRTOS.h>
 #include <rtos/task.h>
+#include <plt/clock.h>
 
 static void systick_init(void)
 {
@@ -62,4 +63,5 @@ void SysTick_Handler(void)
 #if (INCLUDE_xTaskGetSchedulerState  == 1 )
     }
 #endif  /* INCLUDE_xTaskGetSchedulerState */
+	tick_increase();
 }

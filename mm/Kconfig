@@ -1,0 +1,41 @@
+menu "Memory Type Select"
+
+choice
+	prompt "Memory type select"
+	default MEM_SELECT_4
+
+config MEM_SELECT_1
+	bool "memory selcet 1"
+	help
+		Only memory can be requested.
+
+config MEM_SELECT_2
+	bool "memory selcet 2"
+	help
+		Uses a best-match algorithm that allows previously allocated memory blocks to be freed,
+		but it does not synthesize adjacent free blocks into a larger block.
+
+config MEM_SELECT_3
+	bool "memory selcet 3"
+	help
+		Encapsulates the malloc() and free() functions in the standard library, using the encapsulation
+		method of hanging the scheduler before manipulating the memory and restoring the scheduler when
+		finished. The encapsulated malloc() and free() functions are thread-protected.
+
+config MEM_SELECT_4
+	bool "memory selcet 4"
+	help
+		It is more similar to the second one, except that a merge algorithm is added to combine adjacent
+		blocks of free memory into one large block.
+
+config MEM_SELECT_5
+	bool "memory selcet 5"
+	help
+		Allows the memory heap to span multiple non-contiguous memory regions and requires a displayed
+		initialization of the memory heap, other than that all other operations are very similar to the
+		fourth memory management strategy.
+
+endchoice
+
+endmenu
+

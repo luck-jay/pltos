@@ -30,8 +30,10 @@ USER_CFLAGS  := \
 USER_LDFLAGS  := \
 			-Wl,-Map,$(TARGET).map,--cref -Wl,-Tlink.lds -Wl,--gc-sections
 
+ARCH ?= $(CONFIG_ARCH:"%"=%)
+
 -include include/config/auto.conf
--include arch/cortex-m3/Makefile
+-include arch/$(ARCH)/Makefile
 
 CROSS_COMPILE ?= $(CONFIG_CROSS_COMPILE:"%"=%)
 
@@ -71,6 +73,7 @@ SIZE        = $(CROSS_COMPILE)size
 OCD         = openocd
 PYTHON      = python
 
+export ARCH
 export AS LD CC AR NM STRIP OBJCOPY OBJDUMP OCD PYTHON
 export MAKE MAKEFLAGS
 export CFLAGS CXXFLAGS LDFLAGS

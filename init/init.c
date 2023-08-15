@@ -41,5 +41,5 @@ int entry(void)
 
 	vTaskStartScheduler();
 
-	while (1);
+	return 0;
 }
